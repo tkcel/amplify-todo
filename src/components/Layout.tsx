@@ -27,7 +27,7 @@ export const Layout: FC<LayoutProps> = ({
          <a>About</a>
        </Link>{' '}
        |{' '}
-       <Link href="/todos">
+       <Link href="/todo">
          <a>Todo</a>
        </Link>
      </nav>
