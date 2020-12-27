@@ -3,6 +3,7 @@ import {
   OnCreateTodoSubscription,
   OnDeleteTodoSubscription,
   OnUpdateTodoSubscription,
+  TodoStatus
 } from '@/API'
 import { listTodos } from '@/graphql/queries'
 import {
@@ -14,7 +15,7 @@ import { nonNull } from '@/lib/filter'
 import { query, subscription } from '@/lib/graphql'
 import { Todo } from '@/models/todo' // --- ②
 import { configure } from '@/my-aws-exports'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 configure()
 
@@ -48,7 +49,7 @@ export const useTodos = () => { // --- ③
   useEffect(() => {
     query<ListTodosQuery>(listTodos).then((result) => { // --- ⑥
       if (result.data?.listTodos?.items) {
-        setTodos([...todos, ...result.data.listTodos.items.filter(nonNull)])
+        setTodos([...todos, ...result.data.listTodos.items.filter(nonNull).map(Todo.fromApi),])
       }
     })
     const onCreate = subscription<OnCreateTodoSubscription>( // --- ⑦
@@ -60,7 +61,7 @@ export const useTodos = () => { // --- ③
         },
       }) => {
         if (onCreateTodo) {
-          addTodo(onCreateTodo)
+          addTodo(Todo.fromApi(onCreateTodo))
         }
       },
     })
@@ -73,7 +74,7 @@ export const useTodos = () => { // --- ③
         },
       }) => {
         if (onUpdateTodo) {
-          updateTodo(onUpdateTodo)
+          updateTodo(Todo.fromApi(onUpdateTodo))
         }
       },
     })
@@ -86,7 +87,7 @@ export const useTodos = () => { // --- ③
         },
       }) => {
         if (onDeleteTodo) {
-          deleteTodo(onDeleteTodo)
+          deleteTodo(Todo.fromApi(onDeleteTodo))
         }
       },
     })
@@ -97,7 +98,19 @@ export const useTodos = () => { // --- ③
     }
   }, [])
 
+  const todosByStatus = useCallback( // --- ③
+    (status: TodoStatus) => {
+      const items = [
+        ...todos.filter((todo) => todo.status === status),
+      ].map((todo) => todo.copy())
+      items.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+      return items
+    },
+    [todos]
+  )
+
   return {
     todos,
+    todosByStatus,
   }
 }

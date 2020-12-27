@@ -10,9 +10,9 @@ import styles from './TodoForm.module.scss'
  
 type TodoFormType = {
  id?: string
- name: string
- status: TodoStatus
- owner?: string
+ name?: string
+ status?: TodoStatus
+ owner?: string | null
 }
  
 type TodoFormProps = {
@@ -34,8 +34,8 @@ export const TodoForm = ({ defaultValues, postSubmit }: TodoFormProps) => {
       createTodo,
       {
         input: {
-          name,
-          status,
+          name : name || '',
+          status : status || TodoStatus.NONE,
         },
       }
     )
