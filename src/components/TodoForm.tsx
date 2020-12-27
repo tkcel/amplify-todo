@@ -9,10 +9,10 @@ import { useForm } from 'react-hook-form'
 import styles from './TodoForm.module.scss'
  
 type TodoFormType = {
- id: string
+ id?: string
  name: string
  status: TodoStatus
- owner: string
+ owner?: string
 }
  
 type TodoFormProps = {
