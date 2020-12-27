@@ -1,16 +1,10 @@
 import { LoginRequired } from '@/components/auth'
 import { Todos } from '@/components/Todo'
-import { onAuthUIStateChange } from '@aws-amplify/ui-components'
-import { useEffect, useState } from 'react'
+import { AmplifyUserContext } from '@/store/user' // --- ①
+import { useContext } from 'react'
 
 const TodoPage = () => {
-  const [user, setUser] = useState<object>()
-
-  useEffect(() => {
-    return onAuthUIStateChange((_, data) => {
-      setUser(data)
-    })
-  }, [])
+  const user = useContext(AmplifyUserContext) // --- ②
 
   return <LoginRequired>{user ? <Todos /> : null}</LoginRequired>
 }
